@@ -5,7 +5,7 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class PackOrderResult {
+public class InterfaceResult {
     private String id;
     private String carton_pk;
     private String salebill_pk;

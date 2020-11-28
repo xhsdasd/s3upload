@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xh.s3upload.dao.SaleOutDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.xh.s3upload.to.SaleOut" id="saleOutMap">
+        <result property="salebillid" column="salebillid"/>
+        <result property="ven_goods" column="vengoods"/>
+        <result property="ven_batch_nbr" column="ven_batch_nbr"/>
+        <result property="salebillno" column="salebillno"/>
+        <result property="ven_goodsname" column="ven_goodsname"/>
+        <result property="ven_spec" column="ven_spec"/>
+        <result property="ven_producer" column="ven_producer"/>
+        <result property="ven_unit" column="ven_unit"/>
+        <result property="prddate" column="prddate"/>
+        <result property="enddate" column="enddate"/>
+        <result property="ratifier" column="ratifier"/>
+        <result property="msunitno" column="msunitno"/>
+        <result property="packnum" column="packnum"/>
+        <result property="inv_type" column="inv_type"/>
+        <result property="billamt" column="billamt"/>
+        <result property="billqty" column="billqty"/>
+        <result property="price" column="price"/>
+        <result property="prc" column="prc"/>
+        <result property="taxrate" column="taxrate"/>
+        <result property="tax" column="tax"/>
+        <result property="amt" column="amt"/>
+        <result property="sumvalue" column="sumvalue"/>
+        <result property="trdprc" column="trdprc"/>
+        <result property="rtlprc" column="rtlprc"/>
+    </resultMap>
+    <update id="updateSaleList">
+        update saleoutdt set sthree='Y'
+        <foreach item="item" index="index" collection="succescList" open="( " separator=") or (" close=" )">
+           where billno=SUBSTRING(#{item},1, CHARINDEX('-',#{item})-1) and billsn=SUBSTRING(#{item}),1,len(#{item})- CHARINDEX('-',#{item}))
+        </foreach>
+    </update>
+    <select id="getReqList" resultMap="saleOutMap">
+        select  cast(b.billno as varchar)+'-'+cast(b.billsn as varchar) as SALEBILLID,
+        c.goodscode as vengoods,
+        d.batchcode as VEN_BATCH_NBR,
+        cast(a.billcode as varchar)+'-'+cast(b.billsn as varchar) SALEBILLNO,
+        c.goodsname as ven_goodsname,
+        c.goodsspec as VEN_SPEC,--待换成医院规格
+        c.manufacturer as VEN_PRODUCER,
+        e.unit as VEN_UNIT,
+        d.ProduceDate as PRDDATE,
+        d.ValDate as ENDDATE,
+        f.ApprovalNo as RATIFIER,
+        e.unit as MSUNITNO,
+        b.meas as PACKNUM,
+        '00' as INV_TYPE,
+        cast(b.taxamount as decimal(20,2)) as BILLAMT,
+         b.num as BILLQTY,
+        cast(b.price as decimal(20,2)) as  PRICE,
+        cast(b.taxprice*(1+(f.TAXRATE/100)) as decimal(20,2))  as PRC,
+        cast(f.TAXRATE as decimal(20,2)) as TAXRATE ,
+        cast(b.taxamount*f.TAXRATE/100 as decimal(20,2)) as  TAX,
+        cast(b.amount as decimal(20,2)) as AMT,
+        cast(b.taxamount*(1+(f.TAXRATE/100)) as decimal(20,2)) as SUMVALUE,
+        cast(b.taxprice*(1+(f.TAXRATE/100)) as decimal(20,2)) as TRDPRC,
+        cast(b.retailp as decimal(20,2)) as RTLPRC
+        from saleoutmt a
+        left join saleoutdt b on b.billno=a.billno
+        join  goodsdoc c on c.goodsid=b.goodsid
+        join batchcode d on d.angleid=b.angleid and d.goodsid=b.goodsid
+        JOIN PGPrice e on b.goodsid=e.goodsid and b.packid=e.packid
+        join goodsattr f on f.goodsid=b.goodsid
+        where a.billcode in
+        <foreach item="item" index="index" collection="billcodes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </select>
+
+
+</mapper>

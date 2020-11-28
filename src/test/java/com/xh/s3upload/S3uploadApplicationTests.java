@@ -1,6 +1,6 @@
 package com.xh.s3upload;
 
-import com.xh.s3upload.to.PackOrderResult;
+import com.xh.s3upload.to.InterfaceResult;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
@@ -9,6 +9,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.BufferedInputStream;
@@ -20,12 +21,14 @@ import java.util.List;
 
 @SpringBootTest
 class S3uploadApplicationTests {
-
+    @Value("${interface.hospital_code}")
+    private String code;
     @Test
     void contextLoads() throws IllegalAccessException, InvocationTargetException, InstantiationException, DocumentException, NoSuchMethodException, ClassNotFoundException {
-        String post = post("http://59.41.111.229:6081/SPD_DDI/DDIService?wsdl");
-        readXmlFun(post);
-        System.out.println(post);
+//        String post = post("http://59.41.111.229:6081/SPD_DDI/DDIService?wsdl");
+//        readXmlFun(post);
+//        System.out.println(post);
+        System.out.println(code);
     }
 
     /**
@@ -113,11 +116,11 @@ class S3uploadApplicationTests {
 
 
         //1.反射，得到类的引用
-        Class PackListResult = Class.forName("com.xh.s3upload.to.PackOrderResult");
+        Class PackListResult = Class.forName("com.xh.s3upload.to.InterfaceResult");
         //通过类的引用，得到类的对象
         Object stuInstance = PackListResult.newInstance();
         //创建一个list 来放多个student的对象
-        List<PackOrderResult> students = new ArrayList<PackOrderResult>();
+        List<InterfaceResult> students = new ArrayList<InterfaceResult>();
 
 //        //将XML文件读取为一份document对象
        Document document = DocumentHelper.parseText(s);
@@ -144,7 +147,7 @@ class S3uploadApplicationTests {
                 //通过反射调用方法，调用stuInstance对象的method方法，参数为stuData---给各属性赋值
                 method1.invoke(stuInstance, stuData);
                 //将每个学生对象添加到list列表中
-                students.add((PackOrderResult)stuInstance);
+                students.add((InterfaceResult)stuInstance);
             }
 
         }

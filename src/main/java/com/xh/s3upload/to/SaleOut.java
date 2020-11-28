@@ -1,11 +1,20 @@
 package com.xh.s3upload.to;
 
+import lombok.Data;
+import lombok.ToString;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
+
+@Data
+@ToString
 public class SaleOut {
-    private String hospital_code;
+    private String hospital_code="0559400";
     private String salebillid;
     private String ven_goods;
     private String ven_batch_nbr;
-    private String address_code;
+    private String address_code="055940004";
     private String salebillno;
     private String ven_goodsname;
     private String ven_spec;
@@ -17,19 +26,19 @@ public class SaleOut {
     private String msunitno;
     private int packnum;
     private String inv_type;
-    private double billamt;
+    private BigDecimal billamt;
     private int billqty;
-    private double price;
-    private double prc;
-    private double taxrate;
-    private String tax;
-    private double amt;
-    private double sumvalue;
-    private double trdprc;
-    private long rtlprc;
-    private String mark1;
-    private String mark2;
-    private int mark3;
-    private int mark4;
-    private String mark5;
+    private BigDecimal price;
+    private BigDecimal prc;
+    private BigDecimal taxrate;
+    private BigDecimal tax;
+    private BigDecimal amt;
+    private BigDecimal sumvalue;
+    private BigDecimal trdprc;
+    private BigDecimal rtlprc;
+//    private String mark1;
+//    private String mark2;
+//    private String mark3;
+//    private String mark4;
+//    private String mark5;
 }
