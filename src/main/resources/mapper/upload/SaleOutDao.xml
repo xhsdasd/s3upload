@@ -31,9 +31,9 @@
         <result property="rtlprc" column="rtlprc"/>
     </resultMap>
     <update id="updateSaleList">
-        update saleoutdt set sthree='Y'
+        update saleoutdt set sthree='Y' where
         <foreach item="item" index="index" collection="succescList" open="( " separator=") or (" close=" )">
-           where billno=SUBSTRING(#{item},1, CHARINDEX('-',#{item})-1) and billsn=SUBSTRING(#{item}),1,len(#{item})- CHARINDEX('-',#{item}))
+         billno=SUBSTRING(#{item},1, CHARINDEX('-',#{item})-1) and billsn=SUBSTRING(#{item},1,len(#{item})- CHARINDEX('-',#{item}))
         </foreach>
     </update>
     <select id="getReqList" resultMap="saleOutMap">

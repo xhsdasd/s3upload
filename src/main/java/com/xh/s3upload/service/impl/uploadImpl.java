@@ -57,8 +57,8 @@ public class uploadImpl implements uploadService {
                     log.info("接口返回:"+ interfaceResult);
                     return interfaceResult;
                 }).collect(Collectors.toList());
-
-               saleOutDao.updateSaleList(succescList);
+                if(succescList!=null&&succescList.size()>0){
+               saleOutDao.updateSaleList(succescList);}
                 break;
             case 2:
                 break;
