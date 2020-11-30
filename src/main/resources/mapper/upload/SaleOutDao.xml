@@ -31,16 +31,20 @@
         <result property="rtlprc" column="rtlprc"/>
     </resultMap>
     <update id="updateSaleList">
-        update saleoutdt set sthree='Y' where
+        update a
+        set sthree='N'
+        from saleoutdt a
+        left join saleoutmt b on a.billno=b.billno
+        where
         <foreach item="item" index="index" collection="succescList" open="( " separator=") or (" close=" )">
-         billno=SUBSTRING(#{item},1, CHARINDEX('-',#{item})-1) and billsn=SUBSTRING(#{item},1,len(#{item})- CHARINDEX('-',#{item}))
+         b.billcode=left(#{item},12) and billsn=SUBSTRING(#{item},13,len(#{item}))
         </foreach>
     </update>
     <select id="getReqList" resultMap="saleOutMap">
-        select  cast(b.billno as varchar)+'-'+cast(b.billsn as varchar) as SALEBILLID,
+        select  a.billcode+cast(b.billsn as varchar) as SALEBILLID,
         c.goodscode as vengoods,
         d.batchcode as VEN_BATCH_NBR,
-        cast(a.billcode as varchar)+'-'+cast(b.billsn as varchar) SALEBILLNO,
+        a.billcode+cast(b.billsn as varchar) SALEBILLNO,
         c.goodsname as ven_goodsname,
         c.goodsspec as VEN_SPEC,--待换成医院规格
         c.manufacturer as VEN_PRODUCER,

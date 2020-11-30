@@ -44,9 +44,9 @@
         </collection>
     </resultMap>
     <update id="updateInvoiceList">
-        update InvoiceMt set sthree='Y' where billno in
+        update InvoiceMt set sthree='Y' where rfid='C2FAFLE1V3Z' and Invoicecode in
         <foreach item="item" index="index" collection="succescList" open="(" separator="," close=")">
-            #{item}
+            SUBSTRING(#{item},1,len(#{item})- CHARINDEX('_',#{item}))
         </foreach>
 <!--        <foreach item="item" index="index" collection="succescList" open="( " separator=") or (" close=" )">-->
 <!--         billno=SUBSTRING(#{item},1, CHARINDEX('-',#{item})-1) and billsn=SUBSTRING(#{item},1,len(#{item})- CHARINDEX('-',#{item}))-->
@@ -63,8 +63,8 @@
         b.TaxAmount as TOTALSUMVALUE,
         d.Num as TOTALSUMQTY,
         1 as impbatch,
-        cast(c.RfBillNo as varchar)+'_'+cast(c.RfBillSn as varchar) as SALEBILLID,
-        cast(e.billcode as varchar)+'_'+cast(c.RfBillSn as varchar) as SALEBILLNO,
+        cast(e.billcode as varchar)+cast(c.RfBillSn as varchar) as SALEBILLID,
+        cast(e.billcode as varchar)+cast(c.RfBillSn as varchar) as SALEBILLNO,
         j.goodsname as ven_goodsname,
         j.goodsspec as VEN_SPEC,
         j.manufacturer as VEN_PRODUCER,
