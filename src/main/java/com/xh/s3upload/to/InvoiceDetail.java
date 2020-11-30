@@ -2,9 +2,11 @@ package com.xh.s3upload.to;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class InvoiceDetail {
-    private long salebillid;
+    private String salebillid;
     private String salebillno;
     private String ven_goods;
     private String ven_goodsname;
@@ -18,18 +20,16 @@ public class InvoiceDetail {
     private String msunitno;
     private String packnum;
     private int billqty;
-    private double price;
-    private double prc;
-    private double taxrate;
-    private double tax;
-    private double amt;
-    private double sumvalue;
-    private double trdprc;
-    private long rtlprc;
-    private String mark1;
-    private String mark2;
-    private int mark3;
-    private int mark4;
-    private String mark5;
-    private String grpno;
+    private BigDecimal price;
+    private BigDecimal prc;
+    private BigDecimal taxrate;
+    private BigDecimal tax;
+    private BigDecimal amt;
+    private BigDecimal sumvalue;
+    private BigDecimal trdprc;
+    private BigDecimal rtlprc;
+    private String tmp_invoive_main_id;
+    private String tmp_invoive_detail_rownum;
+    private String ven_invoice_detail_id;
+
 }

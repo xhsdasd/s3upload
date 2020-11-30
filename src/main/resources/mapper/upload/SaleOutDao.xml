@@ -67,7 +67,7 @@
         join batchcode d on d.angleid=b.angleid and d.goodsid=b.goodsid
         JOIN PGPrice e on b.goodsid=e.goodsid and b.packid=e.packid
         join goodsattr f on f.goodsid=b.goodsid
-        where a.billcode in
+        where  a.billcode in
         <foreach item="item" index="index" collection="billcodes" open="(" separator="," close=")">
             #{item}
         </foreach>

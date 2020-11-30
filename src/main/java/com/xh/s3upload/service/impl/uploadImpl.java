@@ -1,8 +1,10 @@
 package com.xh.s3upload.service.impl;
 
+import com.xh.s3upload.dao.InvoiceDao;
 import com.xh.s3upload.dao.SaleOutDao;
 import com.xh.s3upload.service.uploadService;
 import com.xh.s3upload.to.InterfaceResult;
+import com.xh.s3upload.to.Invoice;
 import com.xh.s3upload.to.ReqParmVo;
 import com.xh.s3upload.to.SaleOut;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +32,8 @@ public class uploadImpl implements uploadService {
 
     @Autowired
     private SaleOutDao saleOutDao;
+    @Autowired
+    private InvoiceDao invoiceDao;
 
     @Override
     public  List<InterfaceResult> upload(ReqParmVo reqParmVo) {
@@ -40,7 +44,7 @@ public class uploadImpl implements uploadService {
                List<SaleOut>saleOuts= saleOutDao.getReqList(reqParmVo.getBillcodes());
                List<String> succescList=new ArrayList<>();
                interfaceResultList = saleOuts.parallelStream().map(s -> {
-                   log.info("上传信息："+s.toString());
+                   log.info("上传出库信息："+s.toString());
                     String resStr = post(1, s);
                     InterfaceResult interfaceResult = new InterfaceResult();
                     try {
@@ -50,17 +54,39 @@ public class uploadImpl implements uploadService {
                         }
                     } catch (Exception e) {
                         interfaceResult = new InterfaceResult();
-                        interfaceResult.setSyslog("服务器上传失败");
+                        interfaceResult.setSyslog("出库服务器上传失败");
                         interfaceResult.setStatus("1");
                         interfaceResult.setSalebill_pk(s.getSalebillid());
                     }
-                    log.info("接口返回:"+ interfaceResult);
+                    log.info("出库接口返回:"+ interfaceResult);
                     return interfaceResult;
                 }).collect(Collectors.toList());
                 if(succescList!=null&&succescList.size()>0){
                saleOutDao.updateSaleList(succescList);}
                 break;
             case 2:
+                List<Invoice>invoices= invoiceDao.getReqList(reqParmVo.getBillcodes());
+                List<String> succescList1=new ArrayList<>();
+                interfaceResultList = invoices.parallelStream().map(s -> {
+                    log.info("发票上传信息："+s.toString());
+                    String resStr = post(2, s);
+                    InterfaceResult interfaceResult = new InterfaceResult();
+                    try {
+                        interfaceResult = readXmlFun(resStr).get(0);
+                        if (interfaceResult.getStatus().equals("0")) {
+                            succescList1.add(interfaceResult.getInvoice_pk());
+                        }
+                    } catch (Exception e) {
+                        interfaceResult = new InterfaceResult();
+                        interfaceResult.setSyslog("发票服务器上传失败");
+                        interfaceResult.setStatus("1");
+                        interfaceResult.setInvoice_pk(s.getInvoiceno());
+                    }
+                    log.info("发票接口返回:"+ interfaceResult);
+                    return interfaceResult;
+                }).collect(Collectors.toList());
+                if(succescList1!=null&&succescList1.size()>0){
+                    invoiceDao.updateInvoiceList(succescList1);}
                 break;
         }
         return interfaceResultList;
@@ -185,7 +211,58 @@ public class uploadImpl implements uploadService {
                 xmlString.append("    </saleBillLists>");
                 xmlString.append("    </ser:sendSaleBillList>");
                 break;
-            case 3:
+            case 2:
+                Invoice t2= (Invoice) t;
+                xmlString.append("   <ser:sendInvoiceList>");
+                xmlString.append("  <username>gdgjyy</username>");
+                xmlString.append("  <password>gdgjyy2020</password>");
+                xmlString.append("  <inputInvoiceLists>");
+                xmlString.append(" <hospital_code>"+t2.getHospital_code()+"</hospital_code>");
+                xmlString.append(" <invoiceid>"+t2.getInvoiceid()+"</invoiceid>");
+                xmlString.append(" <invoice_type>"+t2.getInvoice_type()+"</invoice_type>");
+                xmlString.append(" <invoiceno>"+t2.getInvoiceno()+"</invoiceno>");
+                xmlString.append(" <inv_clientname>"+t2.getInv_clientname()+"</inv_clientname>");
+                xmlString.append(" <invoice_remrak>"+t2.getInvoice_remrak()+"</invoice_remrak>");
+                xmlString.append(" <invoice_dt>"+t2.getInvoice_dt()+"</invoice_dt>");
+                xmlString.append(" <totalsumvalue>"+t2.getTotalsumvalue()+"</totalsumvalue>");
+                xmlString.append(" <totalsumqty>"+t2.getTotalsumqty()+"</totalsumqty>");
+                xmlString.append(" <impbatch>"+t2.getImpbatch()+"</impbatch>");
+
+                if(t2.getInputInvoiceDetailBean()!=null&&t2.getInputInvoiceDetailBean().size()>0){
+                    t2.getInputInvoiceDetailBean().stream().map(d->{
+                        xmlString.append(" <details>");
+                        xmlString.append(" <salebillid>"+d.getSalebillid()+"</salebillid>");
+                        xmlString.append(" <salebillno>"+d.getSalebillno()+"</salebillno>");
+                        xmlString.append(" <ven_goods>"+d.getVen_goods()+"</ven_goods>");
+                        xmlString.append(" <ven_goodsname>"+d.getVen_goodsname()+"</ven_goodsname>");
+                        xmlString.append(" <ven_spec>"+d.getVen_spec()+"</ven_spec>");
+                        xmlString.append(" <ven_producer>"+d.getVen_producer()+"</ven_producer>");
+                        xmlString.append(" <ven_unit>"+d.getVen_unit()+"</ven_unit>");
+                        xmlString.append(" <batch_nbr>"+d.getBatch_nbr()+"</batch_nbr>");
+                        xmlString.append(" <enddate>"+d.getEnddate()+"</enddate>");
+                        xmlString.append(" <prddate>"+d.getPrddate()+"</prddate>");
+                        xmlString.append(" <ratifier>"+d.getRatifier()+"</ratifier>");
+                        xmlString.append(" <msunitno>"+d.getMsunitno()+"</msunitno>");
+                        xmlString.append(" <packnum>"+d.getPacknum()+"</packnum>");
+                        xmlString.append(" <billqty>"+d.getBillqty()+"</billqty>");
+                        xmlString.append(" <price>"+d.getPrice()+"</price>");
+                        xmlString.append(" <prc>"+d.getPrc()+"</prc>");
+                        xmlString.append(" <taxrate>"+d.getTaxrate()+"</taxrate>");
+                        xmlString.append(" <tax>"+d.getTax()+"</tax>");
+                        xmlString.append(" <amt>"+d.getAmt()+"</amt>");
+                        xmlString.append(" <sumvalue>"+d.getSumvalue()+"</sumvalue>");
+                        xmlString.append(" <trdprc>"+d.getTrdprc()+"</trdprc>");
+                        xmlString.append(" <rtlprc>"+d.getRtlprc()+"</rtlprc>");
+                        xmlString.append(" <tmp_invoive_main_id>"+d.getTmp_invoive_main_id()+"</tmp_invoive_main_id>");
+                        xmlString.append(" <tmp_invoive_detail_rownum>"+d.getTmp_invoive_detail_rownum()+"</tmp_invoive_detail_rownum>");
+                        xmlString.append(" <ven_invoice_detail_id>"+d.getVen_invoice_detail_id()+"</ven_invoice_detail_id>");
+                        xmlString.append(" </details>");
+                        return "";
+                    });
+                }
+
+                xmlString.append("    </inputInvoiceLists>");
+                xmlString.append("    </ser:sendInvoiceList>");
                 break;
 
         }

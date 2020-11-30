@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xh.s3upload.dao.InvoiceDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.xh.s3upload.to.Invoice" id="invoiceMap">
+        <result property="hospital_code" column="hospital_code"/>
+        <result property="invoiceid" column="invoiceid"/>
+        <result property="invoice_type" column="invoice_type"/>
+        <result property="invoiceno" column="invoiceno"/>
+        <result property="inv_clientname" column="inv_clientname"/>
+        <result property="invoice_remrak" column="invoice_remrak"/>
+        <result property="invoice_dt" column="invoice_dt"/>
+        <result property="totalsumvalue" column="totalsumvalue"/>
+        <result property="totalsumqty" column="totalsumqty"/>
+        <result property="impbatch" column="impbatch"/>
+        <collection property="inputInvoiceDetailBean" ofType="com.xh.s3upload.to.InvoiceDetail">
+            <result property="salebillid" column="salebillid"/>
+            <result property="salebillno" column="salebillno"/>
+            <result property="ven_goods" column="ven_goods"/>
+            <result property="ven_goodsname" column="ven_goodsname"/>
+            <result property="ven_spec" column="ven_spec"/>
+            <result property="ven_producer" column="ven_producer"/>
+            <result property="ven_unit" column="ven_unit"/>
+            <result property="batch_nbr" column="batch_nbr"/>
+            <result property="enddate" column="enddate"/>
+            <result property="prddate" column="prddate"/>
+            <result property="ratifier" column="ratifier"/>
+            <result property="msunitno" column="msunitno"/>
+            <result property="packnum" column="packnum"/>
+            <result property="billqty" column="billqty"/>
+            <result property="price" column="price"/>
+            <result property="prc" column="prc"/>
+            <result property="taxrate" column="taxrate"/>
+            <result property="tax" column="tax"/>
+            <result property="amt" column="amt"/>
+            <result property="sumvalue" column="sumvalue"/>
+            <result property="trdprc" column="trdprc"/>
+            <result property="rtlprc" column="rtlprc"/>
+            <result property="tmp_invoive_main_id" column="tmp_invoive_main_id"/>
+            <result property="tmp_invoive_detail_rownum" column="tmp_invoive_detail_rownum"/>
+            <result property="ven_invoice_detail_id" column="ven_invoice_detail_id"/>
+        </collection>
+    </resultMap>
+    <update id="updateInvoiceList">
+        update InvoiceMt set sthree='Y' where billno in
+        <foreach item="item" index="index" collection="succescList" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+<!--        <foreach item="item" index="index" collection="succescList" open="( " separator=") or (" close=" )">-->
+<!--         billno=SUBSTRING(#{item},1, CHARINDEX('-',#{item})-1) and billsn=SUBSTRING(#{item},1,len(#{item})- CHARINDEX('-',#{item}))-->
+<!--        </foreach>-->
+    </update>
+    <select id="getReqList" resultMap="invoiceMap">
+        SELECT top 99.999999 percent
+        b.InvoiceRail+'_'+b.InvoiceCode as INVOICEID,
+        '00' as INVOICE_TYPE,
+        b.TaxNo+'_'+b.InvoiceCode as INVOICENO,
+        f.BusinessName as INV_CLIENTNAME,
+        b.remark as INVOICE_REMRAK,
+        b.dates as INVOICE_DT,
+        b.TaxAmount as TOTALSUMVALUE,
+        d.Num as TOTALSUMQTY,
+        1 as impbatch,
+        cast(c.RfBillNo as varchar)+'_'+cast(c.RfBillSn as varchar) as SALEBILLID,
+        cast(e.billcode as varchar)+'_'+cast(c.RfBillSn as varchar) as SALEBILLNO,
+        j.goodsname as ven_goodsname,
+        j.goodsspec as VEN_SPEC,
+        j.manufacturer as VEN_PRODUCER,
+        k.unit as VEN_UNIT,
+        l.ProduceDate as PRDDATE,
+        l.ValDate as ENDDATE,
+        n.ApprovalNo as RATIFIER,
+        k.unit as MSUNITNO,
+        c.meas as PACKNUM,
+        m.num as BILLQTY,
+        cast(m.price as decimal(20,2)) as  PRICE,
+        cast(m.taxprice*(1+(n.TAXRATE/100)) as decimal(20,2))  as PRC,
+        cast(n.TAXRATE as decimal(20,2)) as TAXRATE ,
+        cast(m.taxamount*n.TAXRATE/100 as decimal(20,2)) as  TAX,
+        cast(m.amount as decimal(20,2)) as AMT,
+        cast(m.taxamount*(1+(n.TAXRATE/100)) as decimal(20,2)) as SUMVALUE,
+        cast(m.taxprice*(1+(n.TAXRATE/100)) as decimal(20,2)) as TRDPRC,
+        cast(m.retailp as decimal(20,2)) as RTLPRC,
+        b.billno as  tmp_invoive_main_id,
+        d.dnum as  tmp_invoive_detail_rownum,
+        cast(b.billno as varchar) +'_'+ cast(c.billsn as varchar) ven_invoice_detail_id
+
+        FROM InvoiceMt b
+        left join Invoicedt c on c.billno=b.billno
+        join businessdoc f on b.rfid = f.businessid and b.entid = f.entid
+        join (select billno,sum(Num) as num,count(1) as dnum from Invoicedt group by billno ) d on d.billno=b.billno
+        left join saleoutmt e on e.billno=c.rfbillno
+        join  goodsdoc j on j.goodsid=c.goodsid
+        JOIN PGPrice k on c.goodsid=k.goodsid and c.packid=k.packid
+        join batchcode l on l.angleid=c.angleid and l.goodsid=c.goodsid
+        join goodsattr n on n.goodsid=c.goodsid
+        left join saleoutdt m on m.billno=e.billno
+        where b.rfid='C2FAFLE1V3Z' and b.billno='94977'
+        group by b.InvoiceRail,b.InvoiceCode,b.TaxNo,f.BusinessName,b.remark,b.dates,b.TaxAmount,d.num,
+        c.RfBillNo,c.RfBillSn,e.billcode,j.goodsname,j.goodsspec,j.manufacturer,k.unit,l.ProduceDate,l.ValDate,
+        n.ApprovalNo,k.unit,c.meas,m.price,m.taxprice,n.TAXRATE,m.taxamount,m.amount,m.retailp,m.num,b.billno,
+        c.billsn,d.dnum
+
+        where  b.billcode in
+        <foreach item="item" index="index" collection="billcodes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </select>
+
+
+</mapper>
