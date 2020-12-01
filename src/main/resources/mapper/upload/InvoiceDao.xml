@@ -46,11 +46,9 @@
     <update id="updateInvoiceList">
         update InvoiceMt set sthree='Y' where rfid='C2FAFLE1V3Z' and Invoicecode in
         <foreach item="item" index="index" collection="succescList" open="(" separator="," close=")">
-            SUBSTRING(#{item},1,len(#{item})- CHARINDEX('_',#{item}))
+            SUBSTRING(#{item},CHARINDEX('_',#{item})+1,len(#{item}))
         </foreach>
-<!--        <foreach item="item" index="index" collection="succescList" open="( " separator=") or (" close=" )">-->
-<!--         billno=SUBSTRING(#{item},1, CHARINDEX('-',#{item})-1) and billsn=SUBSTRING(#{item},1,len(#{item})- CHARINDEX('-',#{item}))-->
-<!--        </foreach>-->
+
     </update>
     <select id="getReqList" resultMap="invoiceMap">
         SELECT top 99.999999 percent
@@ -65,6 +63,7 @@
         1 as impbatch,
         cast(e.billcode as varchar)+cast(c.RfBillSn as varchar) as SALEBILLID,
         cast(e.billcode as varchar)+cast(c.RfBillSn as varchar) as SALEBILLNO,
+        j.goodscode as VEN_GOODS,
         j.goodsname as ven_goodsname,
         j.goodsspec as VEN_SPEC,
         j.manufacturer as VEN_PRODUCER,
@@ -97,16 +96,16 @@
         join batchcode l on l.angleid=c.angleid and l.goodsid=c.goodsid
         join goodsattr n on n.goodsid=c.goodsid
         left join saleoutdt m on m.billno=e.billno
-        where b.rfid='C2FAFLE1V3Z' and b.billno='94977'
-        group by b.InvoiceRail,b.InvoiceCode,b.TaxNo,f.BusinessName,b.remark,b.dates,b.TaxAmount,d.num,
-        c.RfBillNo,c.RfBillSn,e.billcode,j.goodsname,j.goodsspec,j.manufacturer,k.unit,l.ProduceDate,l.ValDate,
-        n.ApprovalNo,k.unit,c.meas,m.price,m.taxprice,n.TAXRATE,m.taxamount,m.amount,m.retailp,m.num,b.billno,
-        c.billsn,d.dnum
-
-        where  b.billcode in
+        where b.rfid='C2FAFLE1V3Z'  and b.billcode in
         <foreach item="item" index="index" collection="billcodes" open="(" separator="," close=")">
             #{item}
         </foreach>
+
+        group by b.InvoiceRail,b.InvoiceCode,b.TaxNo,f.BusinessName,b.remark,b.dates,b.TaxAmount,d.num,
+        c.RfBillNo,c.RfBillSn,e.billcode,j.goodsname,j.goodsspec,j.manufacturer,k.unit,l.ProduceDate,l.ValDate,
+        n.ApprovalNo,k.unit,c.meas,m.price,m.taxprice,n.TAXRATE,m.taxamount,m.amount,m.retailp,m.num,b.billno,
+        c.billsn,d.dnum,j.goodscode
+
 
     </select>
 

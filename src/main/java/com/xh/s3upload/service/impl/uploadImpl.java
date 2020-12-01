@@ -229,36 +229,37 @@ public class uploadImpl implements uploadService {
                 xmlString.append(" <impbatch>"+t2.getImpbatch()+"</impbatch>");
 
                 if(t2.getInputInvoiceDetailBean()!=null&&t2.getInputInvoiceDetailBean().size()>0){
-                    t2.getInputInvoiceDetailBean().stream().map(d->{
+                   t2.getInputInvoiceDetailBean().parallelStream().forEach(d -> {
                         xmlString.append(" <details>");
-                        xmlString.append(" <salebillid>"+d.getSalebillid()+"</salebillid>");
-                        xmlString.append(" <salebillno>"+d.getSalebillno()+"</salebillno>");
-                        xmlString.append(" <ven_goods>"+d.getVen_goods()+"</ven_goods>");
-                        xmlString.append(" <ven_goodsname>"+d.getVen_goodsname()+"</ven_goodsname>");
-                        xmlString.append(" <ven_spec>"+d.getVen_spec()+"</ven_spec>");
-                        xmlString.append(" <ven_producer>"+d.getVen_producer()+"</ven_producer>");
-                        xmlString.append(" <ven_unit>"+d.getVen_unit()+"</ven_unit>");
-                        xmlString.append(" <batch_nbr>"+d.getBatch_nbr()+"</batch_nbr>");
-                        xmlString.append(" <enddate>"+d.getEnddate()+"</enddate>");
-                        xmlString.append(" <prddate>"+d.getPrddate()+"</prddate>");
-                        xmlString.append(" <ratifier>"+d.getRatifier()+"</ratifier>");
-                        xmlString.append(" <msunitno>"+d.getMsunitno()+"</msunitno>");
-                        xmlString.append(" <packnum>"+d.getPacknum()+"</packnum>");
-                        xmlString.append(" <billqty>"+d.getBillqty()+"</billqty>");
-                        xmlString.append(" <price>"+d.getPrice()+"</price>");
-                        xmlString.append(" <prc>"+d.getPrc()+"</prc>");
-                        xmlString.append(" <taxrate>"+d.getTaxrate()+"</taxrate>");
-                        xmlString.append(" <tax>"+d.getTax()+"</tax>");
-                        xmlString.append(" <amt>"+d.getAmt()+"</amt>");
-                        xmlString.append(" <sumvalue>"+d.getSumvalue()+"</sumvalue>");
-                        xmlString.append(" <trdprc>"+d.getTrdprc()+"</trdprc>");
-                        xmlString.append(" <rtlprc>"+d.getRtlprc()+"</rtlprc>");
-                        xmlString.append(" <tmp_invoive_main_id>"+d.getTmp_invoive_main_id()+"</tmp_invoive_main_id>");
-                        xmlString.append(" <tmp_invoive_detail_rownum>"+d.getTmp_invoive_detail_rownum()+"</tmp_invoive_detail_rownum>");
-                        xmlString.append(" <ven_invoice_detail_id>"+d.getVen_invoice_detail_id()+"</ven_invoice_detail_id>");
+                        xmlString.append(" <salebillid>" + d.getSalebillid() + "</salebillid>");
+                        xmlString.append(" <salebillno>" + d.getSalebillno() + "</salebillno>");
+                        xmlString.append(" <ven_goods>" + d.getVen_goods() + "</ven_goods>");
+                        xmlString.append(" <ven_goodsname>" + d.getVen_goodsname() + "</ven_goodsname>");
+                        xmlString.append(" <ven_spec>" + d.getVen_spec() + "</ven_spec>");
+                        xmlString.append(" <ven_producer>" + d.getVen_producer() + "</ven_producer>");
+                        xmlString.append(" <ven_unit>" + d.getVen_unit() + "</ven_unit>");
+                        xmlString.append(" <batch_nbr>" + d.getBatch_nbr() + "</batch_nbr>");
+                        xmlString.append(" <enddate>" + d.getEnddate() + "</enddate>");
+                        xmlString.append(" <prddate>" + d.getPrddate() + "</prddate>");
+                        xmlString.append(" <ratifier>" + d.getRatifier() + "</ratifier>");
+                        xmlString.append(" <msunitno>" + d.getMsunitno() + "</msunitno>");
+                        xmlString.append(" <packnum>" + d.getPacknum() + "</packnum>");
+                        xmlString.append(" <billqty>" + d.getBillqty() + "</billqty>");
+                        xmlString.append(" <price>" + d.getPrice() + "</price>");
+                        xmlString.append(" <prc>" + d.getPrc() + "</prc>");
+                        xmlString.append(" <taxrate>" + d.getTaxrate() + "</taxrate>");
+                        xmlString.append(" <tax>" + d.getTax() + "</tax>");
+                        xmlString.append(" <amt>" + d.getAmt() + "</amt>");
+                        xmlString.append(" <sumvalue>" + d.getSumvalue() + "</sumvalue>");
+                        xmlString.append(" <trdprc>" + d.getTrdprc() + "</trdprc>");
+                        xmlString.append(" <rtlprc>" + d.getRtlprc() + "</rtlprc>");
+                        xmlString.append(" <tmp_invoive_main_id>" + d.getTmp_invoive_main_id() + "</tmp_invoive_main_id>");
+                        xmlString.append(" <tmp_invoive_detail_rownum>" + d.getTmp_invoive_detail_rownum() + "</tmp_invoive_detail_rownum>");
+                        xmlString.append(" <ven_invoice_detail_id>" + d.getVen_invoice_detail_id() + "</ven_invoice_detail_id>");
                         xmlString.append(" </details>");
-                        return "";
                     });
+
+
                 }
 
                 xmlString.append("    </inputInvoiceLists>");

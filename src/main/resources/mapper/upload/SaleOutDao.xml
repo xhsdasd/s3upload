@@ -32,7 +32,7 @@
     </resultMap>
     <update id="updateSaleList">
         update a
-        set sthree='N'
+        set sthree='Y'
         from saleoutdt a
         left join saleoutmt b on a.billno=b.billno
         where
