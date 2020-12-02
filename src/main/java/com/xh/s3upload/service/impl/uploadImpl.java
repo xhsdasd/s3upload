@@ -1,12 +1,10 @@
 package com.xh.s3upload.service.impl;
 
 import com.xh.s3upload.dao.InvoiceDao;
+import com.xh.s3upload.dao.PackOrderDao;
 import com.xh.s3upload.dao.SaleOutDao;
 import com.xh.s3upload.service.uploadService;
-import com.xh.s3upload.to.InterfaceResult;
-import com.xh.s3upload.to.Invoice;
-import com.xh.s3upload.to.ReqParmVo;
-import com.xh.s3upload.to.SaleOut;
+import com.xh.s3upload.to.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
@@ -34,12 +32,37 @@ public class uploadImpl implements uploadService {
     private SaleOutDao saleOutDao;
     @Autowired
     private InvoiceDao invoiceDao;
+    @Autowired
+    private PackOrderDao packOrderDao;
 
     @Override
     public  List<InterfaceResult> upload(ReqParmVo reqParmVo) {
         List<InterfaceResult> interfaceResultList=new ArrayList<>();
         switch (reqParmVo.getType()) {
             case 0:
+                List<PackOrder>packOrders= packOrderDao.getReqList(reqParmVo.getBillcodes());
+                List<String> succescList0=new ArrayList<>();
+                interfaceResultList = packOrders.parallelStream().map(s -> {
+                    log.info("上传装箱单信息："+s.toString());
+                    String resStr = post(0, s);
+                    InterfaceResult interfaceResult = new InterfaceResult();
+                    try {
+                        interfaceResult = readXmlFun(resStr).get(0);
+                        if (interfaceResult.getStatus().equals("0")) {
+                            succescList0.add(interfaceResult.getCarton_pk());
+                        }
+                    } catch (Exception e) {
+                        interfaceResult = new InterfaceResult();
+                        interfaceResult.setSyslog("装箱单服务器上传失败");
+                        interfaceResult.setStatus("1");
+                        interfaceResult.setCarton_pk(s.getCarton_pk());
+                    }
+                    log.info("装箱单接口返回:"+ interfaceResult);
+                    return interfaceResult;
+                }).collect(Collectors.toList());
+                if(succescList0!=null&&succescList0.size()>0){
+                    packOrderDao.updatePackList(succescList0);}
+                break;
             case 1:
                List<SaleOut>saleOuts= saleOutDao.getReqList(reqParmVo.getBillcodes());
                List<String> succescList=new ArrayList<>();
@@ -152,27 +175,30 @@ public class uploadImpl implements uploadService {
         xmlString.append(" <soapenv:Body>");
         switch (type){
             case 0:
+                PackOrder t0 = (PackOrder) t;
                 xmlString.append(" <ser:sendBoxList>");
                 xmlString.append(" <username>gdgjyy</username>");
                 xmlString.append(" <password>gdgjyy2020</password>");
                 xmlString.append(" <boxLists>");
-                xmlString.append(" <hospital_code>0559400</hospital_code>");
-                xmlString.append(" <carton_nbr>010004689010000</carton_nbr>");
-                xmlString.append("<carton_pk>000042424200000</carton_pk>");
-                xmlString.append("<ven_goods>2605300000</ven_goods>");
-                xmlString.append("<ven_batch_nbr>2217600000</ven_batch_nbr>");
-                xmlString.append(" <address_code>055940004</address_code>");
-                xmlString.append("<salebillid>576387000000</salebillid>");
-                xmlString.append("<salebillno>101022004295000000</salebillno>");
-                xmlString.append("<ven_goodsname>盐酸羟考酮缓释片(奥施康定)</ven_goodsname>");
-                xmlString.append(" <ven_spec>500ml</ven_spec>");
-                xmlString.append(" <ven_producer>荷兰 ABBOTT LABORATORIES B.V</ven_producer>");
-                xmlString.append(" <ven_unit>瓶</ven_unit>");
-                xmlString.append("<prddate>2018-11-26 00:00:00.0</prddate>");
-                xmlString.append("<enddate>2020-02-25</enddate>");
-                xmlString.append("<msunitno>瓶</msunitno>");
-                xmlString.append("<packnum>15</packnum>");
-                xmlString.append("<units_pakd>150</units_pakd>");
+                xmlString.append(" <hospital_code>"+t0.getHospital_code()+"</hospital_code>");
+                xmlString.append(" <carton_nbr>"+t0.getCarton_nbr()+"</carton_nbr>");
+                xmlString.append(" <carton_pk>"+t0.getCarton_pk()+"</carton_pk>");
+                xmlString.append(" <ven_goods>"+t0.getVen_goods()+"</ven_goods>");
+                xmlString.append(" <ven_batch_nbr>"+t0.getVen_batch_nbr()+"</ven_batch_nbr>");
+                xmlString.append(" <address_code>"+t0.getAddress_code()+"</address_code>");
+                xmlString.append(" <salebillid>"+t0.getSalebillid()+"</salebillid>");
+                xmlString.append(" <salebillno>"+t0.getSalebillno()+"</salebillno>");
+                xmlString.append(" <ven_goodsname>"+t0.getVen_goodsname()+"</ven_goodsname>");
+                xmlString.append(" <ven_spec>"+t0.getVen_spec()+"</ven_spec>");
+                xmlString.append(" <ven_producer>"+t0.getVen_producer()+"</ven_producer>");
+                xmlString.append(" <ven_unit>"+t0.getVen_unit()+"</ven_unit>");
+                xmlString.append(" <prddate>"+t0.getPrddate()+"</prddate>");
+                xmlString.append(" <enddate>"+t0.getEnddate()+"</enddate>");
+                xmlString.append(" <msunitno>"+t0.getMsunitno()+"</msunitno>");
+                xmlString.append(" <packnum>"+t0.getPacknum()+"</packnum>");
+                xmlString.append(" <units_pakd>"+t0.getUnits_pakd()+"</units_pakd>");
+                xmlString.append(" <box_sum>"+t0.getBox_sum()+"</box_sum>");
+                xmlString.append(" <sngl_flag>"+t0.getSngl_flag()+"</sngl_flag>");
                 xmlString.append("</boxLists>");
                 xmlString.append("</ser:sendBoxList>");
                 break;

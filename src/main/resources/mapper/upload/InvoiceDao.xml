@@ -72,7 +72,7 @@
         l.ValDate as ENDDATE,
         n.ApprovalNo as RATIFIER,
         k.unit as MSUNITNO,
-        c.meas as PACKNUM,
+        cast(n.ConvRatio as decimal(20,0)) as PACKNUM,
         m.num as BILLQTY,
         cast(m.price as decimal(20,2)) as  PRICE,
         cast(m.taxprice*(1+(n.TAXRATE/100)) as decimal(20,2))  as PRC,

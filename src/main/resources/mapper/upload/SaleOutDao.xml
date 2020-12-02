@@ -53,7 +53,7 @@
         d.ValDate as ENDDATE,
         f.ApprovalNo as RATIFIER,
         e.unit as MSUNITNO,
-        b.meas as PACKNUM,
+        cast(f.ConvRatio as decimal(20,0))as PACKNUM,
         '00' as INV_TYPE,
         cast(b.taxamount as decimal(20,2)) as BILLAMT,
          b.num as BILLQTY,

@@ -1,12 +1,17 @@
 package com.xh.s3upload.to;
 
+import lombok.Data;
+import lombok.ToString;
+
+@Data
+@ToString
 public class PackOrder {
-        private String hospital_code;
+        private String hospital_code="0559400";
         private String carton_nbr;
         private String carton_pk;
         private String ven_goods;
         private String ven_batch_nbr;
-        private String address_code;
+        private String address_code="055940004";
         private String salebillid;
         private String salebillno;
         private String ven_goodsname;
@@ -18,11 +23,6 @@ public class PackOrder {
         private String msunitno;
         private int packnum;
         private int units_pakd;
-        private String mark1;
-        private String mark2;
-        private int mark3;
-        private int mark4;
-        private String mark5;
-        private String box_sum;
+        private int box_sum;
         private String Sngl_flag;
 }

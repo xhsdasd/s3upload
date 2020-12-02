@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xh.s3upload.dao.PackOrderDao">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.xh.s3upload.to.PackOrder" id="packOrderMap">
+        <result property="carton_nbr" column="carton_nbr"/>
+        <result property="carton_pk" column="carton_pk"/>
+        <result property="ven_goods" column="ven_goods"/>
+        <result property="ven_batch_nbr" column="ven_batch_nbr"/>
+        <result property="salebillid" column="salebillid"/>
+        <result property="salebillno" column="salebillno"/>
+        <result property="ven_goodsname" column="ven_goodsname"/>
+        <result property="ven_spec" column="ven_spec"/>
+        <result property="ven_producer" column="ven_producer"/>
+        <result property="ven_unit" column="ven_unit"/>
+        <result property="prddate" column="prddate"/>
+        <result property="enddate" column="enddate"/>
+        <result property="msunitno" column="msunitno"/>
+        <result property="packnum" column="packnum"/>
+        <result property="units_pakd" column="units_pakd"/>
+        <result property="box_sum" column="box_sum"/>
+        <result property="sngl_flag" column="sngl_flag"/>
+
+    </resultMap>
+    <update id="updatePackList">
+
+        update GspTraRecMt
+        set sthree='Y'
+        where billno in 
+        <foreach item="item" index="index" collection="succescList" open="(" separator="," close=")">
+            substring(#{item},1,charindex('_',#{item})-1)
+        </foreach>
+    </update>
+    <select id="getReqList" resultMap="packOrderMap">
+        select a.billcode as CARTON_NBR,
+        cast(b.billno as varchar)+'_'+cast(b.billsn as varchar)+'_'+cast(c.billsn as varchar) as CARTON_PK,
+        d.goodscode as VEN_GOODS,
+        e.batchcode as VEN_BATCH_NBR,
+        b.rfbillcode+cast(c.billsn as varchar) as SALEBILLID,
+        b.rfbillcode+cast(c.billsn as varchar) as SALEBILLNO,
+        d.goodsname as ven_goodsname,
+        d.goodsspec as VEN_SPEC,
+        d.manufacturer as VEN_PRODUCER,
+        f.unit as VEN_UNIT,
+        e.ProduceDate as PRDDATE,
+        e.ValDate as ENDDATE,
+        h.ApprovalNo as RATIFIER,
+        f.unit as MSUNITNO,
+        cast(h.ConvRatio as decimal(20,0)) as PACKNUM,
+        cast(i.num as decimal(20,0)) as UNITS_PAKD,
+        b.zjnum as box_sum,
+        'N' as Sngl_flag
+        from GspTraRecMt a
+        left join GspTraRecbill b on a.billno=b.billno
+        left join saleoutdt c on c.billno=b.rfbillno
+        join goodsdoc d on d.goodsid=c.goodsid
+        join batchcode e on e.angleid=c.angleid and e.goodsid=c.goodsid
+        JOIN PGPrice f on c.goodsid=f.goodsid and c.packid=f.packid
+        join goodsattr h on h.goodsid=d.goodsid
+        join (
+        select a.billcode,sum(c.num) as num from GspTraRecMt a
+        left join GspTraRecbill b on a.billno=b.billno
+        left join saleoutdt c on c.billno=b.rfbillno
+        group by a.billcode
+        ) i on i.billcode=a.billcode
+        where   h.ConvRatio!=6666
+        and  a.billcode in
+        <foreach item="item" index="index" collection="billcodes" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+
+    </select>
+
+
+</mapper>
