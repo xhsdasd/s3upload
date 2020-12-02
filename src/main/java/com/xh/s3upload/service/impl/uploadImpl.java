@@ -139,7 +139,7 @@ public class uploadImpl implements uploadService {
         try {
             //设置请求头部类型
             myPost.setRequestHeader("Content-Type", "text/xml");
-            myPost.setRequestHeader("charset", "utf-8");
+            myPost.setRequestHeader("charset", "gbk");
 
 
             myPost.setRequestBody(getXMLStr(type,t));
@@ -157,7 +157,7 @@ public class uploadImpl implements uploadService {
                     bos.write(bytes, 0, count);
                 }
                 byte[] strByte = bos.toByteArray();
-                responseString = new String(strByte, 0, strByte.length, "utf-8");
+                responseString = new String(strByte, 0, strByte.length, "gbk");
                 bos.close();
                 bis.close();
             }

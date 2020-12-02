@@ -103,7 +103,7 @@
 
         group by b.InvoiceRail,b.InvoiceCode,b.TaxNo,f.BusinessName,b.remark,b.dates,b.TaxAmount,d.num,
         c.RfBillNo,c.RfBillSn,e.billcode,j.goodsname,j.goodsspec,j.manufacturer,k.unit,l.ProduceDate,l.ValDate,
-        n.ApprovalNo,k.unit,c.meas,m.price,m.taxprice,n.TAXRATE,m.taxamount,m.amount,m.retailp,m.num,b.billno,
+        n.ApprovalNo,k.unit,n.ConvRatio,m.price,m.taxprice,n.TAXRATE,m.taxamount,m.amount,m.retailp,m.num,b.billno,
         c.billsn,d.dnum,j.goodscode
 
 
