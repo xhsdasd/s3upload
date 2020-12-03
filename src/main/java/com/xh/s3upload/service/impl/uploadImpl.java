@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.StringRequestEntity;
+import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
@@ -132,21 +134,22 @@ public class uploadImpl implements uploadService {
         //创建httpclient工具对象
         HttpClient client = new HttpClient();
         //创建post请求方法
-        PostMethod myPost = new PostMethod("http://59.41.111.229:6081/SPD_DDI/DDIService?wsdl");
+        PostMethod myPost = new UTF8PostMethod("http://59.41.111.229:6081/SPD_DDI/DDIService?wsdl");
+//        PostMethod myPost = new UTF8PostMethod("http://127.0.0.1:9001/jj");
         //设置请求超时时间
         client.setConnectionTimeout(300 * 1000);
         String responseString = null;
         try {
             //设置请求头部类型
-            myPost.setRequestHeader("Content-Type", "text/xml");
-            myPost.setRequestHeader("charset", "gbk");
+            myPost.setRequestHeader("Content-Type", "text/xml;charset=utf-8");
+//            myPost.setRequestHeader("charset", "utf-8");
 
-
-            myPost.setRequestBody(getXMLStr(type,t));
+//            myPost.setRequestBody(getXMLStr(type,t));
             //设置请求体，即xml文本内容，注：这里写了两种方式，一种是直接获取xml内容字符串，一种是读取xml文件以流的形式
 //            InputStream body=this.getClass().getResourceAsStream("/"+xmlFileName);
 //            myPost.setRequestBody(body);
-//            myPost.setRequestEntity(new StringRequestEntity(xmlString,"text/xml","utf-8"));
+
+            myPost.setRequestEntity(new StringRequestEntity(getXMLStr(type,t),"text/xml","utf-8"));
             int statusCode = client.executeMethod(myPost);
             if (statusCode == HttpStatus.SC_OK) {
                 BufferedInputStream bis = new BufferedInputStream(myPost.getResponseBodyAsStream());
@@ -157,7 +160,7 @@ public class uploadImpl implements uploadService {
                     bos.write(bytes, 0, count);
                 }
                 byte[] strByte = bos.toByteArray();
-                responseString = new String(strByte, 0, strByte.length, "gbk");
+                responseString = new String(strByte, 0, strByte.length, "utf-8");
                 bos.close();
                 bis.close();
             }
@@ -170,6 +173,7 @@ public class uploadImpl implements uploadService {
 
     private String getXMLStr(int type,Object t) {
         StringBuilder xmlString = new StringBuilder();
+//        xmlString.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
         xmlString.append("<soapenv:Envelope xmlns:soapenv='http://schemas.xmlsoap.org/soap/envelope/' xmlns:ser='http://service.delivery.gzsino.com/'> ");
         xmlString.append(" <soapenv:Header/>");
         xmlString.append(" <soapenv:Body>");
@@ -342,5 +346,16 @@ public class uploadImpl implements uploadService {
 
         return results;
 
+    }
+
+
+    public static class UTF8PostMethod extends PostMethod{
+        public UTF8PostMethod(String url){
+            super(url);
+        }
+        @Override
+        public String getRequestCharSet() {
+            return "UTF-8";
+        }
     }
 }

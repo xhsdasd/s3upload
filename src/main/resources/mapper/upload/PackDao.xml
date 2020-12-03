@@ -49,7 +49,7 @@
         h.ApprovalNo as RATIFIER,
         f.unit as MSUNITNO,
         cast(h.ConvRatio as decimal(20,0)) as PACKNUM,
-        cast(i.num as decimal(20,0)) as UNITS_PAKD,
+        cast(c.num as decimal(20,0)) as UNITS_PAKD,
         b.zjnum as box_sum,
         'N' as Sngl_flag
         from GspTraRecMt a
@@ -59,12 +59,6 @@
         join batchcode e on e.angleid=c.angleid and e.goodsid=c.goodsid
         JOIN PGPrice f on c.goodsid=f.goodsid and c.packid=f.packid
         join goodsattr h on h.goodsid=d.goodsid
-        join (
-        select a.billcode,sum(c.num) as num from GspTraRecMt a
-        left join GspTraRecbill b on a.billno=b.billno
-        left join saleoutdt c on c.billno=b.rfbillno
-        group by a.billcode
-        ) i on i.billcode=a.billcode
         where   h.ConvRatio!=6666
         and  a.billcode in
         <foreach item="item" index="index" collection="billcodes" open="(" separator="," close=")">
