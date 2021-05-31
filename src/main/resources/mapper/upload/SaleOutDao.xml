@@ -9,6 +9,7 @@
         <result property="ven_goods" column="vengoods"/>
         <result property="ven_batch_nbr" column="ven_batch_nbr"/>
         <result property="salebillno" column="salebillno"/>
+        <result property="address_code" column="address_code"/>
         <result property="ven_goodsname" column="ven_goodsname"/>
         <result property="ven_spec" column="ven_spec"/>
         <result property="ven_producer" column="ven_producer"/>
@@ -45,6 +46,7 @@
         c.goodscode as vengoods,
         d.batchcode as VEN_BATCH_NBR,
         a.billcode+cast(b.billsn as varchar) SALEBILLNO,
+        case when bddress like '%西药房%' then 055940012  else '055940004' end as  address_code
         c.goodsname as ven_goodsname,
         c.goodsspec as VEN_SPEC,--待换成医院规格
         c.manufacturer as VEN_PRODUCER,
