@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -23,7 +24,11 @@ public class uploadController {
     @PostMapping("upload")
     @ResponseBody
     public List<InterfaceResult> preUpload(@RequestBody ReqParmVo reqParmVo){
-        return uploadService.upload(reqParmVo);
+       try{
+        return uploadService.upload(reqParmVo);}
+       catch (Exception e){
+           return Arrays.asList(new InterfaceResult(e.getMessage()));
+       }
     }
 
 

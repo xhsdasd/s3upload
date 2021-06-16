@@ -46,7 +46,7 @@
         c.goodscode as vengoods,
         d.batchcode as VEN_BATCH_NBR,
         a.billcode+cast(b.billsn as varchar) SALEBILLNO,
-        case when bddress like '%西药房%' then 055940012  else '055940004' end as  address_code
+        case when bddress like '%西药房%' then 055940012  else '055940004' end as  address_code,
         c.goodsname as ven_goodsname,
         c.goodsspec as VEN_SPEC,--待换成医院规格
         c.manufacturer as VEN_PRODUCER,
